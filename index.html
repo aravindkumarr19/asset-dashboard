@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Asset Status Tracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <section class="login-screen" id="loginScreen">
+    <form class="login-card" id="loginForm">
+      <p class="eyebrow">BetterInvest internal</p>
+      <h1>Asset Status Dashboard</h1>
+      <p class="subtitle">Sign in with your BetterInvest access details.</p>
+
+      <label>
+        Email
+        <input id="loginEmail" type="email" autocomplete="email" placeholder="name@betterinvest.club" required>
+      </label>
+
+      <label>
+        Password
+        <input id="loginPassword" type="password" autocomplete="current-password" placeholder="Enter password" required>
+      </label>
+
+      <p class="login-error" id="loginError" role="alert"></p>
+      <button class="primary-button login-button" type="submit">Sign in</button>
+    </form>
+  </section>
+
+  <div class="app-shell hidden" id="appShell">
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <span class="brand-mark">BI</span>
+        <div>
+          <strong>Asset Tracker</strong>
+          <small>Operations</small>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav" aria-label="Dashboard navigation">
+        <button class="nav-item active" data-page="overview">Overview</button>
+        <button class="nav-item" data-page="assets">Assets</button>
+        <button class="nav-item" data-page="weekly-report">Weekly Report</button>
+        <button class="nav-item" data-page="production-houses">Production Houses</button>
+        <button class="nav-item" data-page="alerts">Alerts</button>
+        <button class="nav-item" data-page="slack-report">Slack Report</button>
+      </nav>
+
+      <button class="logout-button" id="logoutButton">Logout</button>
+    </aside>
+
+    <main class="main-content">
+      <header class="top-header">
+        <div>
+          <p class="eyebrow">Asset operations</p>
+          <h1 id="pageTitle">Overview</h1>
+          <p class="subtitle">Asset Status Tracker Dashboard</p>
+        </div>
+      </header>
+
+      <div class="error-banner hidden" id="errorBanner"></div>
+
+      <section class="page active" id="overviewPage" data-title="Overview">
+        <div class="summary-grid" aria-label="Asset tracker summary cards">
+          <article class="summary-card">
+            <span>Total assets</span>
+            <strong id="totalAssets">0</strong>
+            <small>Rows in tracker</small>
+          </article>
+          <article class="summary-card">
+            <span>Total eligibility</span>
+            <strong id="totalEligibility">0</strong>
+            <small>Eligibility value</small>
+          </article>
+          <article class="summary-card">
+            <span>Eligibility in crores</span>
+            <strong id="totalCrores">0</strong>
+            <small>Tracker crore value</small>
+          </article>
+          <article class="summary-card">
+            <span>Production houses</span>
+            <strong id="totalPH">0</strong>
+            <small>Unique PH names</small>
+          </article>
+          <article class="summary-card">
+            <span>Live this week</span>
+            <strong id="liveThisWeek">0</strong>
+            <small>Next 7 days</small>
+          </article>
+          <article class="summary-card warning-card">
+            <span>Missing data</span>
+            <strong id="missingData">0</strong>
+            <small>Fields needing review</small>
+          </article>
+        </div>
+
+        <section class="insights-grid">
+          <article class="section-panel">
+            <div class="section-heading compact">
+              <div>
+                <h2>Eligibility by Production House</h2>
+                <p>Total crores grouped by PH.</p>
+              </div>
+            </div>
+            <div class="bar-chart" id="phChart"></div>
+          </article>
+
+          <article class="section-panel">
+            <div class="section-heading compact">
+              <div>
+                <h2>Assets by Live Week</h2>
+                <p>Valid live week distribution.</p>
+              </div>
+            </div>
+            <div class="bar-chart" id="weekChart"></div>
+          </article>
+
+          <article class="section-panel wide-panel">
+            <div class="section-heading compact">
+              <div>
+                <h2>Eligibility Trend</h2>
+                <p>Weekly crore trend from tracker rows.</p>
+              </div>
+            </div>
+            <div class="trend-chart" id="trendChart"></div>
+          </article>
+        </section>
+      </section>
+
+      <section class="page" id="assetsPage" data-title="Assets">
+        <section class="section-panel">
+          <div class="section-heading">
+            <div>
+              <h2>Asset Tracker</h2>
+              <p>Search, filter, and review the full asset tracker data.</p>
+            </div>
+          </div>
+
+          <details class="create-asset-panel">
+            <summary>Create New Asset</summary>
+            <p>Added assets are saved locally in this browser and merged with Google Sheet rows.</p>
+            <form class="asset-form" id="assetForm">
+              <label>
+                Month
+                <input id="assetMonth" name="Month" type="text" placeholder="May'26" required>
+              </label>
+              <label>
+                Live Week
+                <select id="assetLiveWeek" name="Live Week" required>
+                  <option value="">Select week</option>
+                  <option value="Week 1">Week 1</option>
+                  <option value="Week 2">Week 2</option>
+                  <option value="Week 3">Week 3</option>
+                  <option value="Week 4">Week 4</option>
+                  <option value="Week 5">Week 5</option>
+                </select>
+              </label>
+              <label>
+                Movie Name
+                <input id="assetMovieName" name="Movie Name" type="text" required>
+              </label>
+              <label>
+                Asset Name
+                <input id="assetAssetName" name="Asset Name" type="text" required>
+              </label>
+              <label>
+                Eligibility
+                <input id="assetEligibility" name="Eligibility" type="number" step="0.01" min="0" required>
+              </label>
+              <label>
+                Eligibility in Crores
+                <input id="assetCrores" name="Eligibility in Crores" type="number" step="0.01" min="0" required>
+              </label>
+              <label>
+                PH Name
+                <input id="assetPHName" name="PH Name" type="text" required>
+              </label>
+              <label>
+                Live Date
+                <input id="assetLiveDate" name="Live Date" type="date" required>
+              </label>
+              <div class="form-actions">
+                <span id="assetFormNote">Local only. Google Sheet write-back requires Apps Script.</span>
+                <button class="primary-button" type="submit">Add Asset</button>
+              </div>
+            </form>
+          </details>
+
+          <div class="filters-grid">
+            <label>
+              Search
+              <input id="searchInput" type="search" placeholder="Search movie, asset, PH...">
+            </label>
+            <label>
+              Month
+              <select id="monthFilter">
+                <option value="">All months</option>
+              </select>
+            </label>
+            <label>
+              Live Week
+              <select id="weekFilter">
+                <option value="">All weeks</option>
+              </select>
+            </label>
+            <label>
+              PH Name
+              <select id="phFilter">
+                <option value="">All production houses</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Month</th>
+                  <th>Live Week</th>
+                  <th>Movie Name</th>
+                  <th>Asset Name</th>
+                  <th>Eligibility</th>
+                  <th>Eligibility in Crores</th>
+                  <th>PH Name</th>
+                  <th>Live Date</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="assetTableBody"></tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+
+      <section class="page" id="weeklyReportPage" data-title="Weekly Report">
+        <section class="section-panel">
+          <div class="section-heading">
+            <div>
+              <h2>Weekly Report Generator</h2>
+              <p>Slack-ready weekly report generated from the current tracker data.</p>
+            </div>
+            <button class="primary-button" id="copyWeeklyReportButton">Copy Weekly Report</button>
+          </div>
+          <textarea id="weeklyReport" readonly></textarea>
+        </section>
+      </section>
+
+      <section class="page" id="productionHousesPage" data-title="Production Houses">
+        <section class="section-panel">
+          <div class="section-heading">
+            <div>
+              <h2>Production Houses</h2>
+              <p>Grouped tracker totals by PH Name.</p>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>PH Name</th>
+                  <th>Asset Count</th>
+                  <th>Total Eligibility</th>
+                  <th>Eligibility in Crores</th>
+                  <th>Latest Live Date</th>
+                </tr>
+              </thead>
+              <tbody id="productionHouseTableBody"></tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+
+      <section class="page" id="alertsPage" data-title="Alerts">
+        <section class="section-panel">
+          <div class="section-heading compact">
+            <div>
+              <h2>Asset Tracker Alerts</h2>
+              <p>Data quality and operational checks from tracker rows.</p>
+            </div>
+          </div>
+          <div class="alerts-list" id="alertsList"></div>
+        </section>
+      </section>
+
+      <section class="page" id="slackReportPage" data-title="Slack Report">
+        <section class="section-panel">
+          <div class="section-heading">
+            <div>
+              <h2>Slack Report</h2>
+              <p>Professional tracker summary for internal updates.</p>
+            </div>
+            <button class="primary-button" id="copySlackReportButton">Copy Slack Report</button>
+          </div>
+          <textarea id="slackReport" readonly></textarea>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
